@@ -122,8 +122,6 @@ function Affectation() {
 
   // Get unique values for filters
   const engineFamilies = [...new Set(allEngines.map(engine => engine.familleNormalisee))];
-  const engineTypes = ['Levage', 'Roulants', 'Accessoires'];
-  const demandeurs = ['SMA', 'DEPA'];
 
   // Filtered engines
   const filteredEngines = useMemo(() => {
