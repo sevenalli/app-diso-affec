@@ -1,14 +1,10 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  Layout,
-  PageHeader,
-  StatCard,
-  FilterBar,
-  Table,
-  Button,
   Settings,
   Plus,
+  Search,
+  Filter,
   Edit3,
   Trash2,
   Eye,
@@ -16,8 +12,11 @@ import {
   TrendingUp,
   AlertTriangle,
   CheckCircle,
+  Clock,
+  Download,
+  RefreshCw,
   Zap
-} from '../components/ui';
+} from 'lucide-react';
 
 function Engines() {
   // Use the same data structure as Disponibility page for consistency
@@ -176,236 +175,381 @@ function Engines() {
   };
 
   return (
-    <Layout>
-      {/* Page Header */}
-      <PageHeader
-        title="Gestion des Engins"
-        subtitle={
-          <div className="flex items-center">
-            <Zap className="w-4 h-4 mr-2 text-amber-500" />
-            Surveillance complète et gestion avancée de votre flotte
-          </div>
-        }
-        icon={Settings}
-        actions={[
-          {
-            icon: Plus,
-            children: 'Ajouter Engin',
-            onClick: () => console.log('Add engine')
-          }
-        ]}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Premium Page Header */}
+        <div className="relative overflow-hidden bg-white rounded-2xl shadow-xl border border-gray-100">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-indigo-600/5"></div>
+          <div className="relative px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                  <Settings className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+                    Gestion des Engins
+                  </h1>
+                  <p className="text-gray-600 mt-1 flex items-center">
+                    <Zap className="w-4 h-4 mr-2 text-amber-500" />
+                    Surveillance complète et gestion avancée de votre flotte
+                  </p>
+                </div>
+              </div>
 
-      {/* Statistics Dashboard */}
-      <Layout.Grid cols={4}>
-        <StatCard
-          title="Disponibles"
-          value={availableEngines.length}
-          icon={CheckCircle}
-          color="green"
-          trend={TrendingUp}
-          trendValue="+2.3%"
-        />
-
-        <StatCard
-          title="Maintenance"
-          value={unavailableEngines.length}
-          icon={AlertTriangle}
-          color="red"
-          trend={AlertTriangle}
-          trendValue="Attention"
-        />
-
-        <StatCard
-          title="Total Engins"
-          value={filteredEngines.length}
-          icon={Settings}
-          color="blue"
-          trend={Activity}
-        />
-
-        <StatCard
-          title="Disponibilité"
-          value={`${averageAvailability}%`}
-          icon={TrendingUp}
-          color="purple"
-          trend={Activity}
-          trendValue="Excellent"
-          progress={averageAvailability}
-          progressLabel="Performance"
-        />
-      </Layout.Grid>
-
-      {/* Filter Bar */}
-      <FilterBar
-        title="Filtres Avancés"
-        subtitle="Recherchez et filtrez vos engins"
-        onClearFilters={clearFilters}
-      >
-        <FilterBar.Grid columns={5}>
-          <FilterBar.Input
-            label="Recherche Intelligente"
-            emoji="🔍"
-            type="search"
-            placeholder="Rechercher par ID, désignation, opérateur..."
-            value={searchTerm}
-            onChange={setSearchTerm}
-            clearable
-            className="md:col-span-2"
-          />
-
-          <FilterBar.Input
-            label="Statut"
-            emoji="📊"
-            type="select"
-            placeholder="Tous les Statuts"
-            value={selectedStatus}
-            onChange={setSelectedStatus}
-            options={[
-              { value: 'available', label: 'Disponible' },
-              { value: 'unavailable', label: 'Indisponible' }
-            ]}
-          />
-
-          <FilterBar.Input
-            label="Type"
-            emoji="⚙️"
-            type="select"
-            placeholder="Tous les Types"
-            value={selectedType}
-            onChange={setSelectedType}
-            options={engineTypes}
-          />
-
-          <FilterBar.Input
-            label="Famille"
-            emoji="🏗️"
-            type="select"
-            placeholder="Toutes les Familles"
-            value={selectedFamily}
-            onChange={setSelectedFamily}
-            options={engineFamilies}
-          />
-        </FilterBar.Grid>
-      </FilterBar>
-
-      {/* Engines Table */}
-      <Table
-        title="Liste des Engins"
-        subtitle="Gestion complète de votre flotte"
-        icon={Settings}
-        headerColor="blue"
-        data={filteredEngines}
-        columns={[
-          {
-            key: 'id',
-            label: 'ID Engin',
-            emoji: '🆔',
-            render: (value, engine, index) => (
               <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full shadow-sm ${
-                  engine.status === 'available'
-                    ? 'bg-gradient-to-r from-green-400 to-emerald-500'
-                    : 'bg-gradient-to-r from-red-400 to-rose-500 animate-pulse'
-                }`}></div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-gray-900">{value}</span>
-                  <span className="text-xs text-gray-500">#{index + 1}</span>
+                <div className="hidden sm:flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg border">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">
+                    Mis à jour: {new Date().toLocaleString('fr-FR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      day: '2-digit',
+                      month: '2-digit'
+                    })}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => window.location.reload()}
+                  className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                  title="Actualiser"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </button>
+
+                <button
+                  className="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                  title="Exporter les données"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Exporter</span>
+                </button>
+
+                <button className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Ajouter Engin
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Premium Statistics Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Available Engines Card */}
+          <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 opacity-50"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <CheckCircle className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Disponibles</p>
+                    <p className="text-2xl font-bold text-gray-900">{availableEngines.length}</p>
+                  </div>
+                </div>
+                <TrendingUp className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Unavailable Engines Card */}
+          <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-rose-50 opacity-50"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <AlertTriangle className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Maintenance</p>
+                    <p className="text-2xl font-bold text-gray-900">{unavailableEngines.length}</p>
+                  </div>
+                </div>
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Engines Card */}
+          <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-50"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Settings className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Engins</p>
+                    <p className="text-2xl font-bold text-gray-900">{filteredEngines.length}</p>
+                  </div>
+                </div>
+                <Activity className="h-5 w-5 text-blue-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Average Availability Card */}
+          <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-violet-50 opacity-50"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <TrendingUp className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Disponibilité</p>
+                    <p className="text-2xl font-bold text-gray-900">{averageAvailability}%</p>
+                  </div>
+                </div>
+                <Activity className="h-5 w-5 text-purple-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Premium Filter Bar */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Filter className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Filtres Avancés</h2>
+                  <p className="text-sm text-gray-600">Recherchez et filtrez vos engins</p>
                 </div>
               </div>
-            )
-          },
-          {
-            key: 'designation',
-            label: 'Désignation',
-            emoji: '📝',
-            render: (value, engine) => (
-              <div className="max-w-xs">
-                <div className="text-sm font-medium text-gray-900 truncate">{value}</div>
-                <div className="text-xs text-gray-500">{engine.familleNormalisee}</div>
-              </div>
-            )
-          },
-          {
-            key: 'status',
-            label: 'Statut',
-            emoji: '📊',
-            render: (value) => (
-              <Table.StatusBadge
-                variant={value === 'available' ? 'success' : 'danger'}
+              <button
+                onClick={clearFilters}
+                className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
               >
-                {value === 'available' ? '✅ Disponible' : '🔧 Maintenance'}
-              </Table.StatusBadge>
-            )
-          },
-          {
-            key: 'operator',
-            label: 'Opérateur',
-            emoji: '👤',
-            render: (value, engine) => (
-              <div>
-                <div className="text-sm text-gray-900">{value}</div>
-                <div className="text-xs text-gray-500">{engine.location}</div>
-              </div>
-            )
-          },
-          {
-            key: 'lastMaintenance',
-            label: 'Dernière Maintenance',
-            emoji: '🔧',
-            render: (value, engine) => (
-              <div>
-                <div className="text-sm text-gray-900">{value}</div>
-                <div className="text-xs text-gray-500">Prochaine: {engine.nextMaintenance}</div>
-              </div>
-            )
-          },
-          {
-            key: 'operatingHours',
-            label: 'Heures Fonct.',
-            emoji: '⏱️',
-            render: (value, engine) => (
-              <div>
-                <div className="text-sm font-medium text-gray-900">{value}h</div>
-                <div className="text-xs text-gray-500">
-                  {engine.type === 'Electrique' ? '⚡ Électrique' : `⛽ ${engine.fuelConsumption}L`}
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {/* Search Bar */}
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  🔍 Recherche Intelligente
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher par ID, désignation, opérateur..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               </div>
-            )
-          },
-          {
-            key: 'actions',
-            label: 'Actions',
-            emoji: '🎯',
-            render: (_, engine) => (
-              <Table.ActionButtons
-                actions={[
-                  {
-                    icon: Eye,
-                    title: 'Voir détails',
-                    color: 'bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700',
-                    onClick: () => console.log('View', engine.id)
-                  },
-                  {
-                    icon: Edit3,
-                    title: 'Modifier',
-                    color: 'bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700',
-                    onClick: () => console.log('Edit', engine.id)
-                  },
-                  {
-                    icon: Trash2,
-                    title: 'Supprimer',
-                    color: 'bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700',
-                    onClick: () => console.log('Delete', engine.id)
-                  }
-                ]}
-              />
-            )
-          }
-        ]}
-        onRowClick={(engine) => console.log('Row clicked:', engine.id)}
-      />
-    </Layout>
+
+              {/* Status Filter */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  📊 Statut
+                </label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                >
+                  <option value="">Tous les Statuts</option>
+                  <option value="available">Disponible</option>
+                  <option value="unavailable">Indisponible</option>
+                </select>
+              </div>
+
+              {/* Type Filter */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  ⚙️ Type
+                </label>
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                >
+                  <option value="">Tous les Types</option>
+                  {engineTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Family Filter */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  🏗️ Famille
+                </label>
+                <select
+                  value={selectedFamily}
+                  onChange={(e) => setSelectedFamily(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                >
+                  <option value="">Toutes les Familles</option>
+                  {engineFamilies.map((family) => (
+                    <option key={family} value={family}>
+                      {family}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Premium Engines Table */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-5 text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                  <Settings className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Liste des Engins</h2>
+                  <p className="text-blue-100 text-sm">Gestion complète de votre flotte</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">{filteredEngines.length}</div>
+                <div className="text-blue-100 text-xs">Engins trouvés</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🆔 ID Engin
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    📝 Désignation
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    📊 Statut
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    👤 Opérateur
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🔧 Dernière Maintenance
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    ⏱️ Heures Fonct.
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🎯 Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredEngines.map((engine, index) => (
+                  <tr
+                    key={engine.id}
+                    className={`hover:bg-gradient-to-r transition-all duration-200 group ${
+                      engine.status === 'available'
+                        ? 'hover:from-green-50 hover:to-emerald-50'
+                        : 'hover:from-red-50 hover:to-rose-50'
+                    }`}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full shadow-sm ${
+                          engine.status === 'available'
+                            ? 'bg-gradient-to-r from-green-400 to-emerald-500'
+                            : 'bg-gradient-to-r from-red-400 to-rose-500 animate-pulse'
+                        }`}></div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-gray-900">{engine.id}</span>
+                          <span className="text-xs text-gray-500">#{index + 1}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-xs">
+                        <div className="text-sm font-medium text-gray-900 truncate">{engine.designation}</div>
+                        <div className="text-xs text-gray-500">{engine.familleNormalisee}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                        engine.status === 'available'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {engine.status === 'available' ? '✅ Disponible' : '🔧 Maintenance'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">{engine.operator}</div>
+                      <div className="text-xs text-gray-500">{engine.location}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">{engine.lastMaintenance}</div>
+                      <div className="text-xs text-gray-500">Prochaine: {engine.nextMaintenance}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">{engine.operatingHours}h</div>
+                      <div className="text-xs text-gray-500">
+                        {engine.type === 'Electrique' ? '⚡ Électrique' : `⛽ ${engine.fuelConsumption}L`}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          className="group flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:scale-110"
+                          title="Voir détails"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="group flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-200 hover:scale-110"
+                          title="Modifier"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="group flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all duration-200 hover:scale-110"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

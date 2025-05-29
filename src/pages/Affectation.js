@@ -4,173 +4,210 @@ import {
   PageHeader,
   StatCard,
   FilterBar,
-  Table,
-  Plus,
   Users,
   CheckCircle,
-  Clock,
   AlertTriangle,
   TrendingUp,
   Activity,
-  Eye,
-  Edit3,
-  Trash2,
-  UserCheck
+  UserCheck,
+  ArrowRight,
+  ArrowLeft,
+  Save,
+  GripVertical
 } from '../components/ui';
 
 function Affectation() {
-  // Sample affectation data
-  const [allAffectations] = useState([
+  // Sample engines data for affectation
+  const [allEngines, setAllEngines] = useState([
     {
-      id: 'AFF001',
-      engineId: 'MM1ET00803',
-      engineDesignation: 'ELEVATEUR THERMIQUE DCOSAN 8T',
+      id: 'MM1ET00803',
+      dateJour: '2024-01-31',
+      nombreShifts: 3,
+      designation: 'ELEVATEUR THERMIQUE DCOSAN 8T',
+      familleNormalisee: 'CHARIOT ELEVATEUR THERMIQUE',
+      type: 'Levage',
+      status: 'available',
+      demandeur: null,
+      dateAffectation: null
+    },
+    {
+      id: 'MM1ET00804',
+      dateJour: '2024-01-15',
+      nombreShifts: 2,
+      designation: 'CHARIOT ELEVATEUR ELECTRIQUE 3T',
+      familleNormalisee: 'CHARIOT ELEVATEUR ELECTRIQUE',
+      type: 'Roulants',
+      status: 'available',
+      demandeur: null,
+      dateAffectation: null
+    },
+    {
+      id: 'MM1ET00805',
+      dateJour: '2024-01-20',
+      nombreShifts: 1,
+      designation: 'TRACTEUR INDUSTRIEL 5T',
+      familleNormalisee: 'TRACTEUR INDUSTRIEL',
+      type: 'Roulants',
+      status: 'affected',
       demandeur: 'SMA',
-      operateur: 'Jean Dupont',
-      dateDebut: '2024-02-01',
-      dateFin: '2024-02-15',
-      statut: 'active',
-      priorite: 'haute',
-      zone: 'Warehouse A',
-      tache: 'Transport de marchandises',
-      heuresPrevu: 120,
-      heuresRealisees: 85,
-      progression: 71,
-      commentaires: 'Mission en cours, bon déroulement'
+      dateAffectation: '2024-02-01'
     },
     {
-      id: 'AFF002',
-      engineId: 'MM1ET00804',
-      engineDesignation: 'CHARIOT ELEVATEUR ELECTRIQUE 3T',
+      id: 'MM1ET00806',
+      dateJour: '2024-01-25',
+      nombreShifts: 3,
+      designation: 'GRUE MOBILE 10T',
+      familleNormalisee: 'GRUE MOBILE',
+      type: 'Levage',
+      status: 'affected',
       demandeur: 'DEPA',
-      operateur: 'Marie Martin',
-      dateDebut: '2024-01-28',
-      dateFin: '2024-02-10',
-      statut: 'completed',
-      priorite: 'normale',
-      zone: 'Warehouse B',
-      tache: 'Manutention produits finis',
-      heuresPrevu: 80,
-      heuresRealisees: 78,
-      progression: 100,
-      commentaires: 'Mission terminée avec succès'
+      dateAffectation: '2024-01-28'
     },
     {
-      id: 'AFF003',
-      engineId: 'MM1ET00806',
-      engineDesignation: 'GRUE MOBILE 10T',
+      id: 'MM1ET00807',
+      dateJour: '2024-01-28',
+      nombreShifts: 2,
+      designation: 'TRANSPALETTE ELECTRIQUE 2T',
+      familleNormalisee: 'TRANSPALETTE ELECTRIQUE',
+      type: 'Accessoires',
+      status: 'available',
+      demandeur: null,
+      dateAffectation: null
+    },
+    {
+      id: 'MM1ET00808',
+      dateJour: '2024-01-30',
+      nombreShifts: 3,
+      designation: 'NACELLE ELEVATRICE 12M',
+      familleNormalisee: 'NACELLE ELEVATRICE',
+      type: 'Accessoires',
+      status: 'affected',
       demandeur: 'SMA',
-      operateur: 'Sophie Leroy',
-      dateDebut: '2024-02-05',
-      dateFin: '2024-02-20',
-      statut: 'pending',
-      priorite: 'urgente',
-      zone: 'Warehouse C',
-      tache: 'Levage équipements lourds',
-      heuresPrevu: 160,
-      heuresRealisees: 0,
-      progression: 0,
-      commentaires: 'En attente de validation'
+      dateAffectation: '2024-02-02'
     },
     {
-      id: 'AFF004',
-      engineId: 'MM1ET00808',
-      engineDesignation: 'NACELLE ELEVATRICE 12M',
+      id: 'MM1ET00809',
+      dateJour: '2024-02-01',
+      nombreShifts: 1,
+      designation: 'PONT ROULANT 15T',
+      familleNormalisee: 'PONT ROULANT',
+      type: 'Levage',
+      status: 'available',
+      demandeur: null,
+      dateAffectation: null
+    },
+    {
+      id: 'MM1ET00810',
+      dateJour: '2024-02-03',
+      nombreShifts: 2,
+      designation: 'CHARIOT TELESCOPIQUE 4T',
+      familleNormalisee: 'CHARIOT TELESCOPIQUE',
+      type: 'Roulants',
+      status: 'affected',
       demandeur: 'DEPA',
-      operateur: 'Anne Moreau',
-      dateDebut: '2024-01-25',
-      dateFin: '2024-02-08',
-      statut: 'active',
-      priorite: 'normale',
-      zone: 'Warehouse D',
-      tache: 'Maintenance en hauteur',
-      heuresPrevu: 100,
-      heuresRealisees: 65,
-      progression: 65,
-      commentaires: 'Progression normale'
-    },
-    {
-      id: 'AFF005',
-      engineId: 'MM1ET00805',
-      engineDesignation: 'TRACTEUR INDUSTRIEL 5T',
-      demandeur: 'SMA',
-      operateur: 'Pierre Dubois',
-      dateDebut: '2024-02-10',
-      dateFin: '2024-02-25',
-      statut: 'cancelled',
-      priorite: 'basse',
-      zone: 'Maintenance Bay',
-      tache: 'Remorquage équipements',
-      heuresPrevu: 60,
-      heuresRealisees: 15,
-      progression: 25,
-      commentaires: 'Mission annulée - engin en panne'
-    },
-    {
-      id: 'AFF006',
-      engineId: 'MM1ET00804',
-      engineDesignation: 'CHARIOT ELEVATEUR ELECTRIQUE 3T',
-      demandeur: 'DEPA',
-      operateur: 'Luc Bernard',
-      dateDebut: '2024-02-12',
-      dateFin: '2024-02-18',
-      statut: 'active',
-      priorite: 'haute',
-      zone: 'Warehouse B',
-      tache: 'Stockage produits chimiques',
-      heuresPrevu: 90,
-      heuresRealisees: 30,
-      progression: 33,
-      commentaires: 'Début de mission'
+      dateAffectation: '2024-02-05'
     }
   ]);
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedShift, setSelectedShift] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedFamily, setSelectedFamily] = useState('');
+  const [selectedType, setSelectedType] = useState('');
   const [selectedDemandeur, setSelectedDemandeur] = useState('');
-  const [selectedStatut, setSelectedStatut] = useState('');
-  const [selectedPriorite, setSelectedPriorite] = useState('');
-  const [selectedOperateur, setSelectedOperateur] = useState('');
-  const [selectedDateDebut, setSelectedDateDebut] = useState('');
+
+  // Change tracking
+  const [hasChanges, setHasChanges] = useState(false);
+  const [draggedEngine, setDraggedEngine] = useState(null);
 
   // Get unique values for filters
+  const engineFamilies = [...new Set(allEngines.map(engine => engine.familleNormalisee))];
+  const engineTypes = ['Levage', 'Roulants', 'Accessoires'];
   const demandeurs = ['SMA', 'DEPA'];
-  const statuts = [...new Set(allAffectations.map(aff => aff.statut))];
-  const priorites = [...new Set(allAffectations.map(aff => aff.priorite))];
-  const operateurs = [...new Set(allAffectations.map(aff => aff.operateur))];
 
-  // Filtered affectations
-  const filteredAffectations = useMemo(() => {
-    return allAffectations.filter(affectation => {
+  // Filtered engines
+  const filteredEngines = useMemo(() => {
+    return allEngines.filter(engine => {
       const matchesSearch = !searchTerm ||
-        affectation.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        affectation.engineDesignation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        affectation.operateur.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        affectation.tache.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesDemandeur = !selectedDemandeur || affectation.demandeur === selectedDemandeur;
-      const matchesStatut = !selectedStatut || affectation.statut === selectedStatut;
-      const matchesPriorite = !selectedPriorite || affectation.priorite === selectedPriorite;
-      const matchesOperateur = !selectedOperateur || affectation.operateur === selectedOperateur;
-      const matchesDate = !selectedDateDebut || affectation.dateDebut >= selectedDateDebut;
+        engine.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        engine.designation.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesShift = !selectedShift || engine.nombreShifts.toString() === selectedShift;
+      const matchesDate = !selectedDate || engine.dateJour === selectedDate;
+      const matchesFamily = !selectedFamily || engine.familleNormalisee === selectedFamily;
+      const matchesType = !selectedType || engine.type === selectedType;
+      const matchesDemandeur = !selectedDemandeur || engine.demandeur === selectedDemandeur;
 
-      return matchesSearch && matchesDemandeur && matchesStatut && matchesPriorite && matchesOperateur && matchesDate;
+      return matchesSearch && matchesShift && matchesDate && matchesFamily && matchesType && matchesDemandeur;
     });
-  }, [allAffectations, searchTerm, selectedDemandeur, selectedStatut, selectedPriorite, selectedOperateur, selectedDateDebut]);
+  }, [allEngines, searchTerm, selectedShift, selectedDate, selectedFamily, selectedType, selectedDemandeur]);
 
-  // Statistics
-  const activeAffectations = filteredAffectations.filter(aff => aff.statut === 'active');
-  const completedAffectations = filteredAffectations.filter(aff => aff.statut === 'completed');
-  const pendingAffectations = filteredAffectations.filter(aff => aff.statut === 'pending');
-  const totalHeuresPrevu = filteredAffectations.reduce((sum, aff) => sum + aff.heuresPrevu, 0);
-  const totalHeuresRealisees = filteredAffectations.reduce((sum, aff) => sum + aff.heuresRealisees, 0);
-  const tauxRealisation = totalHeuresPrevu > 0 ? Math.round((totalHeuresRealisees / totalHeuresPrevu) * 100) : 0;
+  // Separate available and affected engines
+  const availableEngines = filteredEngines.filter(engine => engine.status === 'available');
+  const affectedEngines = filteredEngines.filter(engine => engine.status === 'affected');
+
+  // Move functions
+  const moveToAffected = (engine) => {
+    setAllEngines(prevEngines =>
+      prevEngines.map(e =>
+        e.id === engine.id
+          ? { ...e, status: 'affected', demandeur: 'SMA', dateAffectation: new Date().toISOString().split('T')[0] }
+          : e
+      )
+    );
+    setHasChanges(true);
+  };
+
+  const moveToAvailable = (engine) => {
+    setAllEngines(prevEngines =>
+      prevEngines.map(e =>
+        e.id === engine.id
+          ? { ...e, status: 'available', demandeur: null, dateAffectation: null }
+          : e
+      )
+    );
+    setHasChanges(true);
+  };
+
+  // Drag and Drop handlers
+  const handleDragStart = (e, engine) => {
+    setDraggedEngine(engine);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDropOnAvailable = (e) => {
+    e.preventDefault();
+    if (draggedEngine && draggedEngine.status === 'affected') {
+      moveToAvailable(draggedEngine);
+    }
+    setDraggedEngine(null);
+  };
+
+  const handleDropOnAffected = (e) => {
+    e.preventDefault();
+    if (draggedEngine && draggedEngine.status === 'available') {
+      moveToAffected(draggedEngine);
+    }
+    setDraggedEngine(null);
+  };
+
+  const saveChanges = () => {
+    console.log('Saving changes:', allEngines);
+    setHasChanges(false);
+    alert('Modifications sauvegardées avec succès!');
+  };
 
   const clearFilters = () => {
     setSearchTerm('');
+    setSelectedShift('');
+    setSelectedDate('');
+    setSelectedFamily('');
+    setSelectedType('');
     setSelectedDemandeur('');
-    setSelectedStatut('');
-    setSelectedPriorite('');
-    setSelectedOperateur('');
-    setSelectedDateDebut('');
   };
   return (
     <Layout>
@@ -180,15 +217,17 @@ function Affectation() {
         subtitle={
           <div className="flex items-center">
             <UserCheck className="w-4 h-4 mr-2 text-amber-500" />
-            Gestion des affectations et suivi des missions
+            Gestion des affectations et assignation des engins
           </div>
         }
         icon={Users}
         actions={[
           {
-            icon: Plus,
-            children: 'Nouvelle Affectation',
-            onClick: () => console.log('Add affectation')
+            icon: Save,
+            children: hasChanges ? 'Sauvegarder' : 'Sauvegardé',
+            variant: hasChanges ? 'success' : 'secondary',
+            onClick: saveChanges,
+            disabled: !hasChanges
           }
         ]}
       />
@@ -196,52 +235,52 @@ function Affectation() {
       {/* Statistics Dashboard */}
       <Layout.Grid cols={4}>
         <StatCard
-          title="Actives"
-          value={activeAffectations.length}
-          subtitle="Missions en cours"
-          icon={Activity}
-          color="blue"
-          trend={TrendingUp}
-          trendValue="En cours"
-        />
-
-        <StatCard
-          title="Terminées"
-          value={completedAffectations.length}
-          subtitle="Missions accomplies"
+          title="Disponibles"
+          value={availableEngines.length}
+          subtitle="Engins libres"
           icon={CheckCircle}
           color="green"
-          trend={CheckCircle}
-          trendValue="Succès"
+          trend={TrendingUp}
+          trendValue="Prêts"
         />
 
         <StatCard
-          title="En Attente"
-          value={pendingAffectations.length}
-          subtitle="À valider"
-          icon={Clock}
-          color="amber"
-          trend={AlertTriangle}
-          trendValue="Attention"
+          title="Affectés"
+          value={affectedEngines.length}
+          subtitle="Engins assignés"
+          icon={Activity}
+          color="blue"
+          trend={Activity}
+          trendValue="En mission"
         />
 
         <StatCard
-          title="Réalisation"
-          value={`${tauxRealisation}%`}
-          subtitle="Taux d'accomplissement"
-          icon={TrendingUp}
+          title="Total"
+          value={filteredEngines.length}
+          subtitle="Engins filtrés"
+          icon={Users}
           color="purple"
+          trend={TrendingUp}
+          trendValue="Flotte"
+        />
+
+        <StatCard
+          title="Taux Affectation"
+          value={`${filteredEngines.length > 0 ? Math.round((affectedEngines.length / filteredEngines.length) * 100) : 0}%`}
+          subtitle="Utilisation de la flotte"
+          icon={TrendingUp}
+          color="amber"
           trend={Activity}
           trendValue="Performance"
-          progress={tauxRealisation}
-          progressLabel="Heures réalisées"
+          progress={filteredEngines.length > 0 ? Math.round((affectedEngines.length / filteredEngines.length) * 100) : 0}
+          progressLabel="Affectation"
         />
       </Layout.Grid>
 
       {/* Filter Bar */}
       <FilterBar
         title="Filtres Avancés"
-        subtitle="Recherchez et filtrez les affectations"
+        subtitle="Recherchez et filtrez les engins pour affectation"
         onClearFilters={clearFilters}
       >
         <FilterBar.Grid columns={6}>
@@ -249,11 +288,56 @@ function Affectation() {
             label="Recherche Intelligente"
             emoji="🔍"
             type="search"
-            placeholder="Rechercher par ID, engin, opérateur, tâche..."
+            placeholder="Rechercher par ID, désignation..."
             value={searchTerm}
             onChange={setSearchTerm}
             clearable
-            className="md:col-span-2"
+          />
+
+          <FilterBar.Input
+            label="Shift"
+            emoji="⏰"
+            type="select"
+            placeholder="Tous les Shifts"
+            value={selectedShift}
+            onChange={setSelectedShift}
+            options={[
+              { value: '1', label: 'Shift 1' },
+              { value: '2', label: 'Shift 2' },
+              { value: '3', label: 'Shift 3' }
+            ]}
+          />
+
+          <FilterBar.Input
+            label="Date"
+            emoji="�"
+            type="date"
+            value={selectedDate}
+            onChange={setSelectedDate}
+          />
+
+          <FilterBar.Input
+            label="Famille Normalisée"
+            emoji="🏗️"
+            type="select"
+            placeholder="Toutes les Familles"
+            value={selectedFamily}
+            onChange={setSelectedFamily}
+            options={engineFamilies}
+          />
+
+          <FilterBar.Input
+            label="Type"
+            emoji="⚙️"
+            type="select"
+            placeholder="Tous les Types"
+            value={selectedType}
+            onChange={setSelectedType}
+            options={[
+              { value: 'Levage', label: 'Levage' },
+              { value: 'Roulants', label: 'Roulants' },
+              { value: 'Accessoires', label: 'Accessoires' }
+            ]}
           />
 
           <FilterBar.Input
@@ -268,205 +352,225 @@ function Affectation() {
               { value: 'DEPA', label: 'DEPA - Département Production' }
             ]}
           />
-
-          <FilterBar.Input
-            label="Statut"
-            emoji="📊"
-            type="select"
-            placeholder="Tous les Statuts"
-            value={selectedStatut}
-            onChange={setSelectedStatut}
-            options={[
-              { value: 'active', label: 'Active' },
-              { value: 'completed', label: 'Terminée' },
-              { value: 'pending', label: 'En attente' },
-              { value: 'cancelled', label: 'Annulée' }
-            ]}
-          />
-
-          <FilterBar.Input
-            label="Priorité"
-            emoji="⚡"
-            type="select"
-            placeholder="Toutes les Priorités"
-            value={selectedPriorite}
-            onChange={setSelectedPriorite}
-            options={[
-              { value: 'urgente', label: 'Urgente' },
-              { value: 'haute', label: 'Haute' },
-              { value: 'normale', label: 'Normale' },
-              { value: 'basse', label: 'Basse' }
-            ]}
-          />
-
-          <FilterBar.Input
-            label="Date Début"
-            emoji="📅"
-            type="date"
-            value={selectedDateDebut}
-            onChange={setSelectedDateDebut}
-          />
         </FilterBar.Grid>
       </FilterBar>
 
-      {/* Affectations Table */}
-      <Table
-        title="Liste des Affectations"
-        subtitle="Suivi complet des missions et affectations"
-        icon={Users}
-        headerColor="blue"
-        data={filteredAffectations}
-        columns={[
-          {
-            key: 'id',
-            label: 'ID Affectation',
-            emoji: '🆔',
-            render: (value, affectation) => (
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-gray-900">{value}</span>
-                <span className="text-xs text-gray-500">{affectation.engineId}</span>
-              </div>
-            )
-          },
-          {
-            key: 'engineDesignation',
-            label: 'Engin',
-            emoji: '🚛',
-            render: (value, affectation) => (
-              <div className="max-w-xs">
-                <div className="text-sm font-medium text-gray-900 truncate">{value}</div>
-                <div className="text-xs text-gray-500">{affectation.zone}</div>
-              </div>
-            )
-          },
-          {
-            key: 'demandeur',
-            label: 'Demandeur',
-            emoji: '🏢',
-            render: (value) => (
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                value === 'SMA'
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-purple-100 text-purple-800'
-              }`}>
-                {value === 'SMA' ? '🔧 SMA' : '🏭 DEPA'}
-              </span>
-            )
-          },
-          {
-            key: 'operateur',
-            label: 'Opérateur',
-            emoji: '👤',
-            render: (value, affectation) => (
-              <div>
-                <div className="text-sm text-gray-900">{value}</div>
-                <div className="text-xs text-gray-500">{affectation.tache}</div>
-              </div>
-            )
-          },
-          {
-            key: 'statut',
-            label: 'Statut',
-            emoji: '📊',
-            render: (value) => {
-              const variants = {
-                active: 'success',
-                completed: 'info',
-                pending: 'warning',
-                cancelled: 'danger'
-              };
-              const labels = {
-                active: '🟢 Active',
-                completed: '✅ Terminée',
-                pending: '🟡 En attente',
-                cancelled: '❌ Annulée'
-              };
-              return (
-                <Table.StatusBadge variant={variants[value]}>
-                  {labels[value]}
-                </Table.StatusBadge>
-              );
-            }
-          },
-          {
-            key: 'priorite',
-            label: 'Priorité',
-            emoji: '⚡',
-            render: (value) => {
-              const colors = {
-                urgente: 'bg-red-100 text-red-800',
-                haute: 'bg-orange-100 text-orange-800',
-                normale: 'bg-blue-100 text-blue-800',
-                basse: 'bg-gray-100 text-gray-800'
-              };
-              const icons = {
-                urgente: '🔴',
-                haute: '🟠',
-                normale: '🔵',
-                basse: '⚪'
-              };
-              return (
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${colors[value]}`}>
-                  {icons[value]} {value.charAt(0).toUpperCase() + value.slice(1)}
-                </span>
-              );
-            }
-          },
-          {
-            key: 'progression',
-            label: 'Progression',
-            emoji: '📈',
-            render: (value, affectation) => (
-              <div className="w-24">
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                  <span>{value}%</span>
-                  <span>{affectation.heuresRealisees}h/{affectation.heuresPrevu}h</span>
+      {/* Two Side-by-Side Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Available Engines Table */}
+        <div
+          className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+          onDrop={handleDropOnAvailable}
+          onDragOver={handleDragOver}
+        >
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-5 text-white">
+            <div className="relative">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Engins Disponibles</h2>
+                    <p className="text-green-100 text-sm">Prêts pour affectation</p>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full transition-all duration-500 ${
-                      value === 100 ? 'bg-green-500' :
-                      value >= 75 ? 'bg-blue-500' :
-                      value >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}
-                    style={{ width: `${value}%` }}
-                  ></div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">{availableEngines.length}</div>
+                  <div className="text-green-100 text-xs">Disponibles</div>
                 </div>
               </div>
-            )
-          },
-          {
-            key: 'actions',
-            label: 'Actions',
-            emoji: '🎯',
-            render: (_, affectation) => (
-              <Table.ActionButtons
-                actions={[
-                  {
-                    icon: Eye,
-                    title: 'Voir détails',
-                    color: 'bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700',
-                    onClick: () => console.log('View', affectation.id)
-                  },
-                  {
-                    icon: Edit3,
-                    title: 'Modifier',
-                    color: 'bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700',
-                    onClick: () => console.log('Edit', affectation.id)
-                  },
-                  {
-                    icon: Trash2,
-                    title: 'Supprimer',
-                    color: 'bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700',
-                    onClick: () => console.log('Delete', affectation.id)
-                  }
-                ]}
-              />
-            )
-          }
-        ]}
-        onRowClick={(affectation) => console.log('Row clicked:', affectation.id)}
-      />
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto max-h-96">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🆔 ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    📝 Désignation
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🏗️ Famille
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    ⚙️ Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🎯 Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {availableEngines.map((engine) => (
+                  <tr
+                    key={engine.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, engine)}
+                    className="hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all duration-200 group cursor-move"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        <GripVertical className="w-4 h-4 text-gray-400 group-hover:text-green-500" />
+                        <span className="text-sm font-bold text-gray-900">{engine.id}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-gray-900 truncate max-w-xs">{engine.designation}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-gray-600">{engine.familleNormalisee}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        {engine.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => moveToAffected(engine)}
+                        className="group flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-200 hover:scale-110"
+                        title="Affecter cet engin"
+                      >
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Affected Engines Table */}
+        <div
+          className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+          onDrop={handleDropOnAffected}
+          onDragOver={handleDragOver}
+        >
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-5 text-white">
+            <div className="relative">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Engins Affectés</h2>
+                    <p className="text-blue-100 text-sm">En mission</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">{affectedEngines.length}</div>
+                  <div className="text-blue-100 text-xs">Affectés</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto max-h-96">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🆔 ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    📝 Désignation
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🏗️ Famille
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🏢 Demandeur
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    🎯 Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {affectedEngines.map((engine) => (
+                  <tr
+                    key={engine.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, engine)}
+                    className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group cursor-move"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        <GripVertical className="w-4 h-4 text-gray-400 group-hover:text-blue-500" />
+                        <span className="text-sm font-bold text-gray-900">{engine.id}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-gray-900 truncate max-w-xs">{engine.designation}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-gray-600">{engine.familleNormalisee}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                        engine.demandeur === 'SMA'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-purple-100 text-purple-800'
+                      }`}>
+                        {engine.demandeur === 'SMA' ? '🔧 SMA' : '🏭 DEPA'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => moveToAvailable(engine)}
+                        className="group flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:scale-110"
+                        title="Libérer cet engin"
+                      >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Save Changes Notification */}
+      {hasChanges && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className="bg-amber-100 border border-amber-200 rounded-xl p-4 shadow-lg">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-800">
+                  Modifications non sauvegardées
+                </p>
+                <p className="text-xs text-amber-600">
+                  Cliquez sur "Sauvegarder" pour enregistrer les changements
+                </p>
+              </div>
+              <button
+                onClick={saveChanges}
+                className="flex items-center px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors duration-200"
+              >
+                <Save className="w-4 h-4 mr-1" />
+                Sauvegarder
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
