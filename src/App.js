@@ -4,6 +4,7 @@ import SideBar from './components/SideBar';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Engines from './pages/Engines';
 import Disponibility from './pages/Disponibility';
+import Affectation from './pages/Affectation';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
               <Route path="/" element={<div className="text-2xl font-bold">Dashboard</div>} />
               <Route path="/engines" element={<Engines />} />
               <Route path="/disponibility" element={<Disponibility />} />
-              <Route path="/affectation" element={<div className="text-2xl font-bold">Affectation</div>} />
+              <Route path="/affectation" element={<Affectation />} />
               <Route path="/settings" element={<div className="text-2xl font-bold">Settings</div>} />
             </Routes>
           </main>
