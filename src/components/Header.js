@@ -19,9 +19,7 @@ function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-600">
-            Welcome to CMMS
-          </div>
+          
         </div>
       </div>
     </header>

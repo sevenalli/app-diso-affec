@@ -43,11 +43,7 @@ function SideBar() {
       name: 'Affectation',
       icon: Users
     },
-    {
-      path: '/settings',
-      name: 'Settings',
-      icon: Settings
-    }
+   
   ];
 
   return (
@@ -60,7 +56,7 @@ function SideBar() {
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <h1 className="text-xl font-bold text-white">
-              CMMS
+              HAlli
             </h1>
           )}
           <button

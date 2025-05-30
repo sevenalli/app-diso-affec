@@ -19,7 +19,6 @@ function App() {
               <Route path="/engines" element={<Engines />} />
               <Route path="/disponibility" element={<Disponibility />} />
               <Route path="/affectation" element={<Affectation />} />
-              <Route path="/settings" element={<div className="text-2xl font-bold">Settings</div>} />
             </Routes>
           </main>
         </div>
