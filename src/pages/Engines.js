@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Settings,
   Plus,
@@ -7,142 +7,192 @@ import {
   Filter,
   Edit3,
   Trash2,
-  Eye,
   Activity,
   TrendingUp,
   AlertTriangle,
   CheckCircle,
   Clock,
-  Download,
   RefreshCw,
-  Zap
+  Zap,
+  Loader,
+  Upload
 } from 'lucide-react';
+import { enginesAPI } from '../services/api';
+import Modal from '../components/Modal';
+import EngineForm from '../components/EngineForm';
+import ExcelImport from '../components/ExcelImport';
+import BulkDelete from '../components/BulkDelete';
+import { useToast, ToastContainer } from '../components/Toast';
 
 function Engines() {
-  // Use the same data structure as Disponibility page for consistency
-  const [allEngines] = useState([
-    {
-      id: 'MM1ET00803',
-      dateJour: '2024-01-31',
-      nombreShifts: 3,
-      tauxDispo: 100,
-      designation: 'ELEVATEUR THERMIQUE DCOSAN 8T',
-      familleNormalisee: 'CHARIOT ELEVATEUR THERMIQUE',
-      month: 1,
-      year: 2024,
-      type: 'Roulant',
-      status: 'available',
-      location: 'Warehouse A',
-      lastMaintenance: '2024-01-15',
-      nextMaintenance: '2024-03-15',
-      operatingHours: 1250,
-      fuelConsumption: 45.2,
-      operator: 'Jean Dupont'
-    },
-    {
-      id: 'MM1ET00804',
-      dateJour: '2024-01-31',
-      nombreShifts: 2,
-      tauxDispo: 85,
-      designation: 'CHARIOT ELEVATEUR ELECTRIQUE 3T',
-      familleNormalisee: 'CHARIOT ELEVATEUR ELECTRIQUE',
-      month: 1,
-      year: 2024,
-      type: 'Electrique',
-      status: 'available',
-      location: 'Warehouse B',
-      lastMaintenance: '2024-01-20',
-      nextMaintenance: '2024-04-20',
-      operatingHours: 980,
-      fuelConsumption: 0,
-      operator: 'Marie Martin'
-    },
-    {
-      id: 'MM1ET00805',
-      dateJour: '2024-01-31',
-      nombreShifts: 1,
-      tauxDispo: 0,
-      designation: 'TRACTEUR INDUSTRIEL 5T',
-      familleNormalisee: 'TRACTEUR INDUSTRIEL',
-      month: 1,
-      year: 2024,
-      type: 'Roulant',
-      status: 'unavailable',
-      location: 'Maintenance Bay',
-      lastMaintenance: '2024-01-25',
-      nextMaintenance: '2024-02-25',
-      operatingHours: 2100,
-      fuelConsumption: 78.5,
-      operator: 'Pierre Dubois',
-      reason: 'Maintenance préventive',
-      estimatedReturn: '2024-02-05'
-    },
-    {
-      id: 'MM1ET00806',
-      dateJour: '2024-01-31',
-      nombreShifts: 3,
-      tauxDispo: 95,
-      designation: 'GRUE MOBILE 10T',
-      familleNormalisee: 'GRUE MOBILE',
-      month: 1,
-      year: 2024,
-      type: 'Roulant',
-      status: 'available',
-      location: 'Warehouse C',
-      lastMaintenance: '2024-01-10',
-      nextMaintenance: '2024-04-10',
-      operatingHours: 1850,
-      fuelConsumption: 92.3,
-      operator: 'Sophie Leroy'
-    },
-    {
-      id: 'MM1ET00807',
-      dateJour: '2024-01-31',
-      nombreShifts: 2,
-      tauxDispo: 0,
-      designation: 'TRANSPALETTE ELECTRIQUE 2T',
-      familleNormalisee: 'TRANSPALETTE ELECTRIQUE',
-      month: 1,
-      year: 2024,
-      type: 'Electrique',
-      status: 'unavailable',
-      location: 'Repair Shop',
-      lastMaintenance: '2024-01-28',
-      nextMaintenance: '2024-03-28',
-      operatingHours: 750,
-      fuelConsumption: 0,
-      operator: 'Luc Bernard',
-      reason: 'Réparation urgente',
-      estimatedReturn: '2024-02-02'
-    },
-    {
-      id: 'MM1ET00808',
-      dateJour: '2024-01-31',
-      nombreShifts: 3,
-      tauxDispo: 88,
-      designation: 'NACELLE ELEVATRICE 12M',
-      familleNormalisee: 'NACELLE ELEVATRICE',
-      month: 1,
-      year: 2024,
-      type: 'Electrique',
-      status: 'available',
-      location: 'Warehouse D',
-      lastMaintenance: '2024-01-12',
-      nextMaintenance: '2024-04-12',
-      operatingHours: 1420,
-      fuelConsumption: 0,
-      operator: 'Anne Moreau'
-    }
-  ]);
+  // State management
+  const [allEngines, setAllEngines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEngine, setSelectedEngine] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalType, setModalType] = useState('create'); // 'create', 'edit', 'import', 'bulkDelete'
+
+  // Toast notifications
+  const { toasts, success, error, removeToast } = useToast();
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedFamily, setSelectedFamily] = useState('');
 
+  // Load engines data
+  useEffect(() => {
+    loadEngines();
+  }, []);
+
+  const loadEngines = async () => {
+    try {
+      setLoading(true);
+      const response = await enginesAPI.getAll();
+      setAllEngines(response.engines || []);
+    } catch (err) {
+      console.error('Error loading engines:', err);
+      error('Erreur lors du chargement des engins: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle form submission
+  const handleFormSubmit = async (formData) => {
+    try {
+      setIsSubmitting(true);
+
+      if (selectedEngine) {
+        // Update existing engine
+        await enginesAPI.update(selectedEngine.id, formData);
+        success('Engin modifié avec succès!');
+      } else {
+        // Create new engine
+        await enginesAPI.create(formData);
+        success('Engin créé avec succès!');
+      }
+
+      // Reload engines and close modal
+      await loadEngines();
+      setIsModalOpen(false);
+      setSelectedEngine(null);
+    } catch (err) {
+      console.error('Error saving engine:', err);
+      error('Erreur lors de la sauvegarde: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle delete engine
+  const handleDeleteEngine = async (engineId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet engin?')) {
+      return;
+    }
+
+    try {
+      await enginesAPI.delete(engineId);
+      success('Engin supprimé avec succès!');
+      await loadEngines();
+    } catch (err) {
+      console.error('Error deleting engine:', err);
+      error('Erreur lors de la suppression: ' + err.message);
+    }
+  };
+
+  // Handle Excel import
+  const handleExcelImport = async (engines) => {
+    try {
+      setIsSubmitting(true);
+      const response = await enginesAPI.bulkCreate(engines);
+
+      if (response.errors && response.errors.length > 0) {
+        const errorCount = response.errors.length;
+        const successCount = response.createdEngines.length;
+
+        if (successCount > 0) {
+          success(`${successCount} engin(s) importé(s) avec succès. ${errorCount} erreur(s) détectée(s).`);
+        } else {
+          error(`Échec de l'importation. ${errorCount} erreur(s) détectée(s).`);
+        }
+      } else {
+        success(`${engines.length} engin(s) importé(s) avec succès!`);
+      }
+
+      await loadEngines();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Error importing engines:', err);
+      error('Erreur lors de l\'importation: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async (engineIds) => {
+    try {
+      setIsSubmitting(true);
+      const response = await enginesAPI.bulkDelete(engineIds);
+
+      if (response.errors && response.errors.length > 0) {
+        const errorCount = response.errors.length;
+        const successCount = response.deletedEngines.length;
+
+        if (successCount > 0) {
+          success(`${successCount} engin(s) supprimé(s) avec succès. ${errorCount} erreur(s) détectée(s).`);
+        } else {
+          error(`Échec de la suppression. ${errorCount} erreur(s) détectée(s).`);
+        }
+      } else {
+        success(`${engineIds.length} engin(s) supprimé(s) avec succès!`);
+      }
+
+      await loadEngines();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Error deleting engines:', err);
+      error('Erreur lors de la suppression: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Modal handlers
+  const openCreateModal = () => {
+    setSelectedEngine(null);
+    setModalType('create');
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (engine) => {
+    setSelectedEngine(engine);
+    setModalType('edit');
+    setIsModalOpen(true);
+  };
+
+  const openImportModal = () => {
+    setSelectedEngine(null);
+    setModalType('import');
+    setIsModalOpen(true);
+  };
+
+  const openBulkDeleteModal = () => {
+    setSelectedEngine(null);
+    setModalType('bulkDelete');
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedEngine(null);
+    setModalType('create');
+  };
+
   // Get unique values for filters
-  const engineFamilies = [...new Set(allEngines.map(engine => engine.familleNormalisee))];
+  const engineFamilies = [...new Set(allEngines.map(engine => engine.famille_normalisee))];
   const engineTypes = [...new Set(allEngines.map(engine => engine.type))];
 
   // Filtered engines
@@ -150,26 +200,21 @@ function Engines() {
     return allEngines.filter(engine => {
       const matchesSearch = !searchTerm ||
         engine.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        engine.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        engine.operator.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = !selectedStatus || engine.status === selectedStatus;
+        engine.designation.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = !selectedType || engine.type === selectedType;
-      const matchesFamily = !selectedFamily || engine.familleNormalisee === selectedFamily;
+      const matchesFamily = !selectedFamily || engine.famille_normalisee === selectedFamily;
 
-      return matchesSearch && matchesStatus && matchesType && matchesFamily;
+      return matchesSearch && matchesType && matchesFamily;
     });
-  }, [allEngines, searchTerm, selectedStatus, selectedType, selectedFamily]);
+  }, [allEngines, searchTerm, selectedType, selectedFamily]);
 
-  // Statistics
-  const availableEngines = filteredEngines.filter(engine => engine.status === 'available');
-  const unavailableEngines = filteredEngines.filter(engine => engine.status === 'unavailable');
-  const averageAvailability = filteredEngines.length > 0
-    ? Math.round(filteredEngines.reduce((sum, engine) => sum + engine.tauxDispo, 0) / filteredEngines.length)
+  // Statistics (simplified for now - will be enhanced with real availability data)
+  const averageOperatingHours = filteredEngines.length > 0
+    ? Math.round(filteredEngines.reduce((sum, engine) => sum + (engine.operating_hours || 0), 0) / filteredEngines.length)
     : 0;
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedStatus('');
     setSelectedType('');
     setSelectedFamily('');
   };
@@ -219,14 +264,28 @@ function Engines() {
                 </button>
 
                 <button
-                  className="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                  title="Exporter les données"
+                  onClick={openImportModal}
+                  className="flex items-center px-3 py-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
+                  title="Importer depuis Excel"
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Exporter</span>
+                  <Upload className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Importer</span>
                 </button>
 
-                <button className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                <button
+                  onClick={openBulkDeleteModal}
+                  disabled={allEngines.length === 0}
+                  className="flex items-center px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Suppression en lot"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Suppr. Lot</span>
+                </button>
+
+                <button
+                  onClick={openCreateModal}
+                  className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                >
                   <Plus className="w-5 h-5 mr-2" />
                   Ajouter Engin
                 </button>
@@ -247,8 +306,8 @@ function Engines() {
                     <CheckCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Disponibles</p>
-                    <p className="text-2xl font-bold text-gray-900">{availableEngines.length}</p>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Engins</p>
+                    <p className="text-2xl font-bold text-gray-900">{filteredEngines.length}</p>
                   </div>
                 </div>
                 <TrendingUp className="h-5 w-5 text-green-500" />
@@ -256,7 +315,7 @@ function Engines() {
             </div>
           </div>
 
-          {/* Unavailable Engines Card */}
+          {/* Types Count Card */}
           <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
             <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-rose-50 opacity-50"></div>
             <div className="relative p-6">
@@ -266,8 +325,8 @@ function Engines() {
                     <AlertTriangle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Maintenance</p>
-                    <p className="text-2xl font-bold text-gray-900">{unavailableEngines.length}</p>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Types</p>
+                    <p className="text-2xl font-bold text-gray-900">{engineTypes.length}</p>
                   </div>
                 </div>
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
@@ -275,7 +334,7 @@ function Engines() {
             </div>
           </div>
 
-          {/* Total Engines Card */}
+          {/* Families Count Card */}
           <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-50"></div>
             <div className="relative p-6">
@@ -285,8 +344,8 @@ function Engines() {
                     <Settings className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Engins</p>
-                    <p className="text-2xl font-bold text-gray-900">{filteredEngines.length}</p>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Familles</p>
+                    <p className="text-2xl font-bold text-gray-900">{engineFamilies.length}</p>
                   </div>
                 </div>
                 <Activity className="h-5 w-5 text-blue-500" />
@@ -294,18 +353,18 @@ function Engines() {
             </div>
           </div>
 
-          {/* Average Availability Card */}
+          {/* Average Operating Hours Card */}
           <div className="relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-violet-50 opacity-50"></div>
             <div className="relative p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <TrendingUp className="h-6 w-6 text-white" />
+                    <Clock className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Disponibilité</p>
-                    <p className="text-2xl font-bold text-gray-900">{averageAvailability}%</p>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Heures Moy.</p>
+                    <p className="text-2xl font-bold text-gray-900">{averageOperatingHours}h</p>
                   </div>
                 </div>
                 <Activity className="h-5 w-5 text-purple-500" />
@@ -338,7 +397,7 @@ function Engines() {
           </div>
 
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Search Bar */}
               <div className="md:col-span-2 space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
@@ -348,7 +407,7 @@ function Engines() {
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="Rechercher par ID, désignation, opérateur..."
+                    placeholder="Rechercher par ID, désignation..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
@@ -362,22 +421,6 @@ function Engines() {
                     </button>
                   )}
                 </div>
-              </div>
-
-              {/* Status Filter */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  📊 Statut
-                </label>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
-                >
-                  <option value="">Tous les Statuts</option>
-                  <option value="available">Disponible</option>
-                  <option value="unavailable">Indisponible</option>
-                </select>
               </div>
 
               {/* Type Filter */}
@@ -452,16 +495,16 @@ function Engines() {
                     📝 Désignation
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
-                    📊 Statut
+                    ⚙️ Type
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
-                    👤 Opérateur
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
-                    🔧 Dernière Maintenance
+                    🏗️ Famille
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
                     ⏱️ Heures Fonct.
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
+                    ⛽ Carburant
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/50">
                     🎯 Actions
@@ -469,85 +512,124 @@ function Engines() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredEngines.map((engine, index) => (
-                  <tr
-                    key={engine.id}
-                    className={`hover:bg-gradient-to-r transition-all duration-200 group ${
-                      engine.status === 'available'
-                        ? 'hover:from-green-50 hover:to-emerald-50'
-                        : 'hover:from-red-50 hover:to-rose-50'
-                    }`}
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full shadow-sm ${
-                          engine.status === 'available'
-                            ? 'bg-gradient-to-r from-green-400 to-emerald-500'
-                            : 'bg-gradient-to-r from-red-400 to-rose-500 animate-pulse'
-                        }`}></div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-gray-900">{engine.id}</span>
-                          <span className="text-xs text-gray-500">#{index + 1}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="max-w-xs">
-                        <div className="text-sm font-medium text-gray-900 truncate">{engine.designation}</div>
-                        <div className="text-xs text-gray-500">{engine.familleNormalisee}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                        engine.status === 'available'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {engine.status === 'available' ? '✅ Disponible' : '🔧 Maintenance'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{engine.operator}</div>
-                      <div className="text-xs text-gray-500">{engine.location}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{engine.lastMaintenance}</div>
-                      <div className="text-xs text-gray-500">Prochaine: {engine.nextMaintenance}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{engine.operatingHours}h</div>
-                      <div className="text-xs text-gray-500">
-                        {engine.type === 'Electrique' ? '⚡ Électrique' : `⛽ ${engine.fuelConsumption}L`}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          className="group flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:scale-110"
-                          title="Voir détails"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="group flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-200 hover:scale-110"
-                          title="Modifier"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="group flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all duration-200 hover:scale-110"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <Loader className="w-6 h-6 animate-spin text-blue-600" />
+                        <span className="text-gray-600">Chargement des engins...</span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                ) : filteredEngines.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <div className="text-gray-500">
+                        <Settings className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <p className="text-lg font-medium">Aucun engin trouvé</p>
+                        <p className="text-sm">Essayez de modifier vos filtres ou ajoutez un nouvel engin</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredEngines.map((engine, index) => (
+                    <tr
+                      key={engine.id}
+                      className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 rounded-full shadow-sm bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-gray-900">{engine.id}</span>
+                            <span className="text-xs text-gray-500">#{index + 1}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          <div className="text-sm font-medium text-gray-900 truncate">{engine.designation}</div>
+                          <div className="text-xs text-gray-500">Créé: {new Date(engine.created_at).toLocaleDateString('fr-FR')}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          {engine.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">{engine.famille_normalisee}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-gray-900">{engine.operating_hours || 0}h</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          {engine.fuel_consumption ? `${engine.fuel_consumption}L` : '⚡ Électrique'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => openEditModal(engine)}
+                            className="group flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-200 hover:scale-110"
+                            title="Modifier"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteEngine(engine.id)}
+                            className="group flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all duration-200 hover:scale-110"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* Modal for Add/Edit/Import/BulkDelete Engine */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          title={
+            modalType === 'import' ? 'Importer des Engins' :
+            modalType === 'bulkDelete' ? 'Suppression en Lot' :
+            selectedEngine ? 'Modifier Engin' : 'Ajouter Nouvel Engin'
+          }
+          size={modalType === 'import' || modalType === 'bulkDelete' ? 'xl' : 'lg'}
+        >
+          {modalType === 'import' ? (
+            <ExcelImport
+              onImport={handleExcelImport}
+              onCancel={closeModal}
+              isLoading={isSubmitting}
+            />
+          ) : modalType === 'bulkDelete' ? (
+            <BulkDelete
+              engines={allEngines}
+              onDelete={handleBulkDelete}
+              onCancel={closeModal}
+              isLoading={isSubmitting}
+            />
+          ) : (
+            <EngineForm
+              engine={selectedEngine}
+              onSubmit={handleFormSubmit}
+              onCancel={closeModal}
+              isLoading={isSubmitting}
+            />
+          )}
+        </Modal>
+
+        {/* Toast Notifications */}
+        <ToastContainer toasts={toasts} removeToast={removeToast} />
       </div>
     </div>
   );

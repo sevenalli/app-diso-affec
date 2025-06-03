@@ -5,6 +5,7 @@ export { default as FilterBar } from './FilterBar';
 export { default as Table } from './Table';
 export { default as PageHeader } from './PageHeader';
 export { default as Layout } from './Layout';
+export { default as ChartCard } from './ChartCard';
 
 // Re-export commonly used icons for convenience
 export {

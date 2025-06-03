@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, CheckCircle, XCircle, ArrowRight, ArrowLeft, Clock, Search, Filter, Save, GripVertical, TrendingUp, Activity, Zap, AlertTriangle, Download, RefreshCw } from 'lucide-react';
+import {  CheckCircle, ArrowRight, ArrowLeft, Clock, Search, Filter, Save, GripVertical, TrendingUp, Activity, Zap, AlertTriangle, Download, RefreshCw } from 'lucide-react';
 
 function Disponibility() {
   // Sample engine Array
